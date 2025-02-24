@@ -1,65 +1,54 @@
-# Run as administrator for necessary privileges
-
-# Install Winget package manager if not installed
+# Ensure the script is run as administrator for necessary privileges
+# Check if 'winget' is available
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     Write-Host "Winget not found. Please install it manually or ensure it's available on your system."
     Exit
 }
 
+# Function to install programs using winget
+Function Install-Program {
+    param (
+        [string]$packageName
+    )
+    Write-Host "Installing $packageName..."
+    winget install $packageName -y
+}
+
 # Install necessary tools via Winget
-Write-Host "Installing necessary tools..."
+Write-Host "Installing essential tools..."
 
-# Firefox (Internet Browser)
-winget install Mozilla.Firefox -y
+# Install Browsers
+Install-Program -packageName "Mozilla.Firefox"    # Firefox
+Install-Program -packageName "Google.Chrome"     # Chrome
+Install-Program -packageName "Zen-Team.Zen-Browser"  # Zen Browser
 
-# Chrome (Internet Browser)
-winget install Google.Chrome -y
+# Install Media and Development Tools
+Install-Program -packageName "Spotify.Spotify"   # Spotify
+Install-Program -packageName "Microsoft.VisualStudioCode"  # VSCode
+Install-Program -packageName "Microsoft.PowerToys"    # PowerToys
+Install-Program -packageName "WezWez.WezTerm"   # WezTerm
+Install-Program -packageName "RiotGames.LeagueOfLegends"  # League of Legends
+Install-Program -packageName "Microsoft.WindowsTerminal"  # Unix Tab Completion (Windows Terminal)
 
-# Spotify (Not from Microsoft Store)
-winget install Spotify.Spotify -y
+# Install GlazeWM via winget
+Install-Program -packageName "GlazeWM.GlazeWM"   # GlazeWM
 
-# VSCode (Visual Studio Code)
-winget install Microsoft.VisualStudioCode -y
+# Download configurations for GlazeWM and WezTerm
+Write-Host "Downloading configuration files..."
+cd "~\desktop"
+git clone https://github.com/A-Waters/windows-config.git
+cp windows-config\.wezterm.lua ~\.wezterm.lua 
+cp windows-config\Microsoft.PowerShell_profile.ps1 $PROFILE
 
-# PowerToys (via winget)
-winget install Microsoft.PowerToys -y
+Write-Host "GlazeWM and WezTerm configurations downloaded! Please check the Downloads folder for manual installation."
 
-# Install TranslucentTB (from Microsoft Store)
-Write-Host "Installing TranslucentTB from the Microsoft Store..."
-Start-Process "ms-windows-store://pdp/?productid=9PF4KZ2VN4W9"
+# Add Steam to the installation
+Install-Program -packageName "Steam.Steam"  # Steam (for installation)
 
-# Install GlazeWM
-winget install GlazeWM.GlazeWM -y
-
-# Download GlazeWM config
-Write-Host "Downloading GlazeWM configuration..."
-git clone https://example.com/glazewm-config.git
-
-Write-Host "GlazeWM installation complete! Please check the Downloads folder for manual installation."
-
-# Install Zen Browser
-winget install Zen-Team.Zen-Browser -y
-
-# Install WezTerm
-winget install WezWez.WezTerm -y
-
-# Download WezTerm config
-Write-Host "Downloading WezTerm configuration..."
-git clone https://example.com/wezterm-config.git
-
-# Final message
-Write-Host "All installations complete! Please check for any installation prompts."
-
-# Install League of Legends (NA)
-winget install RiotGames.LeagueOfLegends -y
-
-# Install Unix Tab Completion (if applicable)
-winget install Microsoft.WindowsTerminal -y
-
-# Add programs to Startup Folder
+# Add Programs to Startup Folder
 $startupFolder = [System.IO.Path]::Combine([System.Environment]::GetFolderPath('Startup'))
 
-# Function to create shortcut in Startup folder
+# Function to create a shortcut in the Startup folder
 Function Create-Shortcut {
     param (
         [string]$shortcutName,
@@ -71,28 +60,32 @@ Function Create-Shortcut {
     $shortcut.Save()
 }
 
-# Create shortcuts for TranslucentTB, Zen, PowerToys Run, and Glaze
-Write-Host "Adding apps to Startup..."
+# Set up paths for the programs to be added to Startup
+$appsToAddToStartup = @{
+    "Zen"              = "C:\Program Files\Zen\Zen.exe"
+    "PowerToys Run"    = "C:\Program Files\PowerToys\PowerToys.exe"
+    "Glaze"            = "C:\Program Files\GlazeWM\Glaze.exe"
+    "Steam"            = "C:\Program Files\Steam\steam.exe"
+}
 
-# TranslucentTB
-$translucentTBPath = "C:\Program Files\TranslucentTB\TranslucentTB.exe" # Update this path if needed
-Create-Shortcut -shortcutName "TranslucentTB" -targetPath $translucentTBPath
+# Add programs to startup
+Write-Host "Adding programs to startup..."
 
-# Zen
-$zenPath = "C:\Program Files\Zen\Zen.exe" # Update this path if needed
-Create-Shortcut -shortcutName "Zen" -targetPath $zenPath
+foreach ($app in $appsToAddToStartup.Keys) {
+    $appPath = $appsToAddToStartup[$app]
+    if (Test-Path $appPath) {
+        Create-Shortcut -shortcutName $app -targetPath $appPath
+        Write-Host "$app added to Startup."
+    } else {
+        Write-Host "$app not found at $appPath, skipping."
+    }
+}
 
-# PowerToys Run (Assuming PowerToys Run is part of PowerToys)
-$powerToysPath = "C:\Program Files\PowerToys\PowerToys.exe" # Update this path if needed
-Create-Shortcut -shortcutName "PowerToys Run" -targetPath $powerToysPath
+# Final messages
+Write-Host "All installations complete!"
+Write-Host "Please check for any installation prompts and ensure the shortcuts are created in the Startup folder."
 
-# Glaze (Assuming Glaze is installed at a specific path)
-$glazePath = "C:\Program Files\GlazeWM\Glaze.exe" # Update this path if needed
-Create-Shortcut -shortcutName "Glaze" -targetPath $glazePath
-
-Write-Host "All apps added to Startup!"
+Write-Host "For further configuration, please visit the configuration repositories: https://github.com/A-Waters/windows-config"
 
 
-# install steam
-
-# start steam on launch
+restart
