@@ -56,6 +56,8 @@ Install-Program -packageName "RiotGames.LeagueOfLegends.NA"  # League of Legends
 Install-Program -packageName "Microsoft.WindowsTerminal"  # Unix Tab Completion (Windows Terminal)
 Install-Program -packageName "Valve.Steam"  # Steam (for installation)
 Install-Program -packageName "GlazeWM"   # GlazeWM
+Install-Program -packageName "Discord.Discord"
+Install-Program -packageName "OBSProject.OBSStudio"
 
 Write-Host "Spotify Downloading..."
 Start-Process winget -ArgumentList 'install', 'Spotify.Spotify', '--accept-package-agreements', '--accept-source-agreements' -Verb RunAs
@@ -66,9 +68,9 @@ Write-Host "Downloading configuration files..."
 
 cd ~\Documents
 
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd C:\Users\$username\Documents; Remove-Item -Path C:\Users\$username\Documents\windows-config\ -Recurse -Force -ErrorAction SilentlyContinue; git clone https://github.com/A-Waters/windows-config.git"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd C:\Users\$username\Documents; Remove-Item -Path C:\Users\$username\Documents\windows-config\ -Recurse -Force -ErrorAction SilentlyContinue; & 'C:\Program Files\Git\cmd\git.exe' clone https://github.com/A-Waters/windows-config.git"
 
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 10
 
 cp windows-config\.wezterm.lua ~ 
 cp windows-config\Microsoft.PowerShell_profile.ps1 ~
@@ -100,9 +102,8 @@ Function Create-Shortcut {
 # Set up paths for the programs to be added to Startup
 $appsToAddToStartup = @{
     "Zen"              = "C:\Program Files\Zen Browser\Zen.exe"
-    "PowerToys Run"    = "C:\Program Files\PowerToys\PowerToys.exe"
     "Glaze"            = "C:\Program Files\glzr.io\GlazeWM\glazewm.exe"
-    "Steam"            = "C:\Program Files\Steam\steam.exe"
+    "Steam"            = "C:\Program Files (x86)\Steam\steam.exe"
 }
 
 # Add programs to startup
@@ -124,6 +125,5 @@ Write-Host "Please check for any installation prompts and ensure the shortcuts a
 Write-Host "For further configuration, please visit the configuration repositories: https://github.com/A-Waters/windows-config"
 
 
-net USER $username /passwordreq:yes
 # Optional restart (uncomment if needed)
 # restart
