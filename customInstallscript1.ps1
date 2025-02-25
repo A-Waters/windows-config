@@ -66,13 +66,13 @@ Write-Host "Downloading configuration files..."
 
 cd ~\Documents
 
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd C:\Users\$username\Documents; git clone https://github.com/A-Waters/windows-config.git"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd C:\Users\$username\Documents; Remove-Item -Path C:\Users\$username\Documents\windows-config\ -Recurse -Force -ErrorAction SilentlyContinue; git clone https://github.com/A-Waters/windows-config.git"
 
 Start-Sleep -Seconds 5
 
 cp windows-config\.wezterm.lua ~ 
 cp windows-config\Microsoft.PowerShell_profile.ps1 ~
-cp windows-config\.glzr ~
+cp -Recurse windows-config\.glzr ~
 Write-Host "GlazeWM and WezTerm configurations downloaded! Please check the Downloads folder for manual installation."
 
 
